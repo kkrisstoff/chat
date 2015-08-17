@@ -1,0 +1,16 @@
+<% layout('../layouts/page') -%>
+
+<div class="container-fluid">
+    <div class="row">
+        <h2><%= title %></h2>
+    </div>
+    <div class="row">
+        <ul>
+            <% var i, l = users.length; %>
+            <% for (i = 0; i < l; i++ ){ %>
+            <li><%= users[i].username %></li>
+            <% } %>
+        </ul>
+    </div>
+    <div></div>
+</div>

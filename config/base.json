@@ -1,0 +1,27 @@
+{
+    "db": {
+        "path": "mongodb://hapiadmin:hapiadmin1@ds047612.mongolab.com:47612/social_hapi"
+    },
+    "mongoose": {
+        "uri": "mongodb://localhost/chat",
+        "options": {
+            "server": {
+                "socketOptions": {
+                    "keepAlive": 1
+                }
+            }
+        }
+    },
+    "port": 3000,
+    "session": {
+        "key": "sid",
+        "secret": "KillTheSecret",
+        "maxAge": 14400000
+    },
+    "socketKey": {
+        "maxAge": 4000
+    },
+    "logger": {
+        "format": "default"
+    }
+}

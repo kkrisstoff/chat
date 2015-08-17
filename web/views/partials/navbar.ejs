@@ -1,0 +1,21 @@
+<nav class="navbar navbar-default" role="navigation">
+    <ul class="nav navbar-nav">
+        <li><a href="/chat/home">Home</a></li>
+        <% if (user) { %>
+        <li><a href="/chat">Chat</a></li>
+        <li><a href="/chat/friends">My Friends</a></li>
+        <% } %>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+        <% if (user) { %>
+        <li>
+            <p style="margin: 15px;"><%= user %></p>
+        </li>
+        <li>
+            <a href="" onclick="$('<form method=POST action=/user/logout></form>').submit();return false">Log Out</a>
+        </li>
+        <% } else { %>
+        <li><a href="/user/login">Log In</a></li>
+        <% } %>
+    </ul>
+</nav>

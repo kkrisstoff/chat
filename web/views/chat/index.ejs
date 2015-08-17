@@ -1,0 +1,111 @@
+<% layout('../layouts/page') -%>
+
+<p>Welcome <%= user %> to Cool Chat!</p>
+
+<div id="room">
+    <ul class="list-unstyled"></ul>
+    <form method="POST" action="/chat/saveMessage">
+        <input type="text" name="message" class="form-control" autocomplete="off" autofocus placeholder="Message..." />
+    </form>
+</div>
+
+<script>
+    var input = $('#room input');
+    var ul = $('#room ul');
+    var form = $('#room form');
+    var connection = new Connection({
+        prefix: "/chatConnection",
+        socket: {debug: true},
+        debug: true
+    });
+
+    connection.on('open', function() {
+        printStatus('the connection is established');
+    });
+    connection.on('disconnect', function() {
+        printStatus('connection is broken');
+    });
+    connection.on('message', function(e, message) {
+        if (message.text) {
+            printMessage(message.username, message.text);
+        } else if (message.status) {
+            printStatus(message.username + ': ' + message.status);
+        } else {
+            throw new Error("Bad message: " + message);
+        }
+    });
+    connection.on('close', function(e) {
+        printStatus('connection is broken');
+    });
+
+    form.submit(function(e) {
+        e.preventDefault();
+        var text = input.val();
+        try {
+            connection.send({text: text});
+            printMessage("Me", text);
+        } catch(e) {
+            console.log(e);
+            return false;
+        }
+        input.val('');
+        return false;
+    });
+
+    function printStatus(status) {
+        console.log(status);
+        $('<li class="status">').text(status).appendTo(ul);
+    }
+
+    function printMessage(username, text) {
+        $('<li>').append(
+                $('<i>').text(username)
+        ).append('> ' + text)
+                .appendTo(ul);
+    }
+//    var socket = io.connect('ws://localhost:3000', {
+//        'reconnect': false
+//    });
+//    socket
+//        .on('message', function (username, message) {
+//            printMessage(username, message);
+//        })
+//        .on('leave', function (username) {
+//            printStatus(username + "left chart");
+//        })
+//        .on('join', function (username) {
+//            printStatus(username + "join chart");
+//        })
+//        .on('connect', function () {
+//            printStatus('the connection is established');
+//            //form.on('submit', sendMessage);
+//            input.prop('disabled', false);
+//        })
+//        .on('disconnect', function() {
+//            printStatus('connection is broken');
+//            //form.off('submit', sendMessage);
+//            input.prop('disabled', true);
+//            //this.$emit('error');
+//        })
+//        .on('error', function(reason) {
+//           if (reason == 'handshake unauthorized'){
+//               printStatus('you left the chart');
+//           } else {
+//               setTimeout(function () {
+//                socket.socket.connect();
+//               }, 500);
+//           }
+//        });
+//    function sendMessage(e) {
+//        e.preventDefault();
+//        var text = input.val();
+//        console.log("sm1" + text);
+//        socket.emit('message', text, function (data) {
+//            printMessage("Me", text);
+//        });
+//        input.val('');
+//        return false;
+//    }
+
+
+</script>
