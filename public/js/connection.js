@@ -103,6 +103,7 @@ Connection.prototype.onClose = function(event) {
 };
 
 Connection.prototype.send = function(message) {
+    console.log(message);
     if (this.status != this.OPEN) {
         throw new Error("Connection is not open");
     }

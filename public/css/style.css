@@ -6,3 +6,38 @@ body {
 a {
   color: #00B7FF;
 }
+
+/*chat app*/
+.chat-app-holder{
+
+}
+.messages-holder{
+    height: 400px;
+    padding-left: 5px;
+    margin-bottom: 10px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    list-style: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.controls-holder{
+    width: 98%;
+    margin: auto;
+}
+.message-item > span{
+    display: inline-block;
+}
+.message-item .user{
+    width: 65px;
+}
+.message-item .message{
+    width: 600px;
+    padding: 5px 10px;
+    margin: 5px 10px;
+    border-radius: 10px;
+    background-color: #C1E9E9;
+}
+.message-item .status{
+
+}

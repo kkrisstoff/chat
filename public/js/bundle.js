@@ -19723,7 +19723,6 @@ var React = require('react');
 var Messages = require('./Messages.react.js');
 var Controls = require('./Controls.react.js');
 
-
 var TodoList = React.createClass({displayName: "TodoList",
     render: function() {
         var createItem = function(itemText, index) {
@@ -19733,48 +19732,105 @@ var TodoList = React.createClass({displayName: "TodoList",
     }
 });
 
+function setConnection(self) {
+    var connection = new Connection({
+        prefix: "/chatConnection",
+        socket: {debug: true},
+        debug: true
+    });
+    self.connection = connection;
+}
+
 module.exports = ChatApp = React.createClass({displayName: "ChatApp",
+    componentWillMount: function () {
+        console.log("componentWillMount");
+    },
+    componentDidMount: function () {
+        console.log("componentDidMount");
+        setConnection(this);
+        this.setCallbacksToConnection();
+    },
+    componentWillReceiveProps: function () {
+        console.log("componentWillReceiveProps");
+    },
+    componentWillUpdate: function () {
+        console.log("componentWillUpdate");
+
+    },
     getInitialState: function (props) {
         var props = props || this.props;
         return {
             messages: props.messages,
-            count: props.messages? props.messages.length : 0,
-            value: 'Hello!'
+            value: ''
         };
 
     },
-    onFormSubmit: function (e) {
-        e.preventDefault();
-        this.state.messages.push({
-            created: new Date(),
-            id: "55cc83025878c79a2321ec5e",
-            text: this.state.value,
-            username: "user1"
+    /**
+     * Controls --> Message Sent
+     * @param text
+     */
+    onMessageSent: function (text) {
+        this.connection.send({text: text});
+        this.printMessage(null, text)
+    },
+
+    addItemToState: function (item) {
+        this.state.messages.push(item);
+        this.setState({
+            messages: this.state.messages
         });
-        var newState = {
-                messages: this.state.messages,
-                count: this.state.count++,
-                value: ''
+    },
+    printMessage: function (user, message) {
+        var messageItem = {
+                username: user || "Me",//this.props.currentUser.username
+                created: new Date(),
+                text: message,
+                type: "message"
             };
 
-        console.log(this.state);
-        this.setState(newState);
+        this.addItemToState(messageItem)
     },
-    onChange: function (e) {
-        e.preventDefault();
-        console.log(e);
-        this.setState({value: e.target.value});
-    },
-    render: function() {
-        var value = this.state.value;
-        return (
-                React.createElement("div", {className: "messages"}, 
-                    React.createElement(Messages, {messages: this.state.messages}), 
+    printStatus: function (user, status) {
+        var statusItem = {
+                username: user || null,
+                created: new Date(),
+                text: status,
+                type: "status"
+            };
 
-                    React.createElement("form", {onSubmit: this.onFormSubmit}, 
-                        React.createElement("input", {type: "text", name: "message", className: "form-control", value: value, onChange: this.onChange, placeholder: "Message..."}), 
-                        React.createElement("button", {className: "btn"}, "Add")
-                    )
+        this.addItemToState(statusItem);
+    },
+
+    /**Setters*/
+    setCallbacksToConnection: function () {
+        var self = this;
+
+        this.connection.on('open', function() {
+            self.printStatus(null, 'the connection is established');
+        });
+        this.connection.on(null, 'disconnect', function() {
+            self.printStatus(null, 'the connection is broken');
+        });
+        this.connection.on('message', function(e, message) {
+            if (message.text) {
+                self.printMessage(message.username, message.text);
+            } else if (message.status) {
+                self.printStatus(message.username, message.status);
+            } else {
+                throw new Error("Bad message: " + message);
+            }
+        });
+        this.connection.on('close', function(e) {
+            self.printStatus('connection is broken');
+        });
+    },
+
+    render: function() {
+
+        return (
+                React.createElement("div", {className: "chat-app-holder"}, 
+                    React.createElement(Messages, {messages: this.state.messages}), 
+                    React.createElement(Controls, {onMessageSent: this.onMessageSent})
                 )
             );
     }
@@ -19786,33 +19842,20 @@ module.exports = ChatApp = React.createClass({displayName: "ChatApp",
 
 var React = require('react');
 
-var Form = React.createClass({displayName: "Form",
+module.exports = Controls = React.createClass({displayName: "Controls",
     onFormSubmit: function (e) {
         e.preventDefault();
-        console.log(e);
+        var text = e.target[0].value;
+        e.target[0].value = '';
 
-        return false;
+        this.props.onMessageSent(text);
     },
-    onChange: function (e) {
-        console.log(e);
-    },
-    render: function () {
-        return (
-            React.createElement("form", {onSubmit: this.onFormSubmit}, 
-                React.createElement("input", {type: "text", name: "message", className: "form-control", onChange: this.onChange, placeholder: "Message..."}), 
-                React.createElement("button", {className: "btn"}, "Add")
-            )
-            );
-    }
-});
-
-module.exports = Controls = React.createClass({displayName: "Controls",
-
     render: function(){
-
         return (
-            React.createElement("div", {className: "contrils"}, 
-                React.createElement(Form, null)
+            React.createElement("div", {className: "controls-holder"}, 
+                React.createElement("form", {onSubmit: this.onFormSubmit}, 
+                    React.createElement("input", {type: "text", name: "message", className: "form-control", onChange: this.onChange, placeholder: "Message..."})
+                )
             )
             );
     }
@@ -19825,10 +19868,14 @@ var React = require('react');
 
 module.exports = Message = React.createClass({displayName: "Message",
     render: function(){
-        var message = this.props.message;
+        var message = this.props.message,
+            username = message.username? message.username + '> ' : '',
+            textClass = message.type == "status"? "status" : "message";
+        console.log(message);
         return (
-            React.createElement("li", {className: "message"}, 
-                React.createElement("span", {className: "content"}, message.username + '> ' + message.text)
+            React.createElement("li", {className: "message-item"}, 
+                React.createElement("span", {className: "user"}, username), 
+                React.createElement("span", {className: textClass}, message.text)
             )
             )
     }
@@ -19841,9 +19888,13 @@ var React = require('react');
 var Message = require('./Message.react.js');
 
 module.exports = Messages = React.createClass({displayName: "Messages",
-
+    componentDidUpdate: function () {
+        console.log("Messages: componentDidUpdate");
+        var scrollElement = document.getElementById('scrollable');
+        console.log(scrollElement.scrollHeight);
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+    },
     render: function(){
-        console.log(this.props.messages);
         var content = this.props.messages.map(function(message){
             return (
                 React.createElement(Message, {message: message})
@@ -19851,8 +19902,8 @@ module.exports = Messages = React.createClass({displayName: "Messages",
         });
 
         return (
-            React.createElement("ul", {className: "message"}, content)
-            )
+            React.createElement("ul", {id: "scrollable", className: "messages-holder"}, content)
+        )
     }
 });
 
@@ -19863,15 +19914,12 @@ var React = require('react');
 var ChatApp = require('./components/ChatApp.react');
 //var TodoApp = require('./components/TodoApp.react');
 
-// Snag the initial state that was passed from the server side
-var initialState = JSON.parse(document.getElementById('initial-state').innerHTML);
+var initialStateHolder = document.getElementById('initial-state'),
+    initialState = JSON.parse(initialStateHolder.innerHTML),
+    mountNode = document.getElementById('react-app');
+initialStateHolder.innerHTML = '';
 
-// Render the components, picking up where react left off on the server
-var mountNode = document.getElementById('react-app');
-
-React.render(React.createElement(ChatApp, {messages: initialState}), mountNode);
-//Invariant Violation: React.render(): Invalid component element.
-//Instead of passing a component class, make sure to instantiate it by passing it to React.createElement.
+React.render(React.createElement(ChatApp, initialState), mountNode);
 
 },{"./components/ChatApp.react":156,"react":155}],161:[function(require,module,exports){
 // shim for using process in browser

@@ -29,29 +29,30 @@ router.get('/', checkAccess,  function(req, res, next) {
     ChatModel.find({}, function (err, data) {
         if (err) return next(err);
         var i, l = data.length,
-            messages = [];
+            messages = [],
+            initialState;
         for (i = 0; i < l; i++){
             messages.push(data[i].getMessage());
         }
 
+        initialState = {
+            currentUser: user,
+            messages: messages
+        };
         //example
-        var TodoApp = React.createFactory(require('web/components/TodoApp.react'));
-
+        //var TodoApp = React.createFactory(require('web/components/TodoApp.react'));
         var markup = React.renderToString(
             //TodoApp()
-            ChatApp({
-               messages: messages
-            })
+            ChatApp(initialState)
         );
 
         res.render('chat/chat', {
             title: 'Chat',
             user: userName,
-            markup: markup, //Pass rendered react markup
-            state: JSON.stringify(messages) //Pass current state to client side
+            //markup: markup,
+            state: JSON.stringify(initialState)
         });
     });
-
 
 //    res.render('chat', {
 //        title: 'Chat',

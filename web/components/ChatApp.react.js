@@ -4,7 +4,6 @@ var React = require('react');
 var Messages = require('./Messages.react.js');
 var Controls = require('./Controls.react.js');
 
-
 var TodoList = React.createClass({
     render: function() {
         var createItem = function(itemText, index) {
@@ -14,48 +13,105 @@ var TodoList = React.createClass({
     }
 });
 
+function setConnection(self) {
+    var connection = new Connection({
+        prefix: "/chatConnection",
+        socket: {debug: true},
+        debug: true
+    });
+    self.connection = connection;
+}
+
 module.exports = ChatApp = React.createClass({
+    componentWillMount: function () {
+        console.log("componentWillMount");
+    },
+    componentDidMount: function () {
+        console.log("componentDidMount");
+        setConnection(this);
+        this.setCallbacksToConnection();
+    },
+    componentWillReceiveProps: function () {
+        console.log("componentWillReceiveProps");
+    },
+    componentWillUpdate: function () {
+        console.log("componentWillUpdate");
+
+    },
     getInitialState: function (props) {
         var props = props || this.props;
         return {
             messages: props.messages,
-            count: props.messages? props.messages.length : 0,
-            value: 'Hello!'
+            value: ''
         };
 
     },
-    onFormSubmit: function (e) {
-        e.preventDefault();
-        this.state.messages.push({
-            created: new Date(),
-            id: "55cc83025878c79a2321ec5e",
-            text: this.state.value,
-            username: "user1"
+    /**
+     * Controls --> Message Sent
+     * @param text
+     */
+    onMessageSent: function (text) {
+        this.connection.send({text: text});
+        this.printMessage(null, text)
+    },
+
+    addItemToState: function (item) {
+        this.state.messages.push(item);
+        this.setState({
+            messages: this.state.messages
         });
-        var newState = {
-                messages: this.state.messages,
-                count: this.state.count++,
-                value: ''
+    },
+    printMessage: function (user, message) {
+        var messageItem = {
+                username: user || "Me",//this.props.currentUser.username
+                created: new Date(),
+                text: message,
+                type: "message"
             };
 
-        console.log(this.state);
-        this.setState(newState);
+        this.addItemToState(messageItem)
     },
-    onChange: function (e) {
-        e.preventDefault();
-        console.log(e);
-        this.setState({value: e.target.value});
-    },
-    render: function() {
-        var value = this.state.value;
-        return (
-                <div className="messages">
-                    <Messages messages={this.state.messages} />
+    printStatus: function (user, status) {
+        var statusItem = {
+                username: user || null,
+                created: new Date(),
+                text: status,
+                type: "status"
+            };
 
-                    <form onSubmit={this.onFormSubmit} >
-                        <input type="text" name="message" className="form-control" value={value} onChange={this.onChange} placeholder="Message..." />
-                        <button className="btn">Add</button>
-                    </form>
+        this.addItemToState(statusItem);
+    },
+
+    /**Setters*/
+    setCallbacksToConnection: function () {
+        var self = this;
+
+        this.connection.on('open', function() {
+            self.printStatus(null, 'the connection is established');
+        });
+        this.connection.on(null, 'disconnect', function() {
+            self.printStatus(null, 'the connection is broken');
+        });
+        this.connection.on('message', function(e, message) {
+            if (message.text) {
+                self.printMessage(message.username, message.text);
+            } else if (message.status) {
+                self.printStatus(message.username, message.status);
+            } else {
+                throw new Error("Bad message: " + message);
+            }
+        });
+        this.connection.on('close', function(e) {
+            self.printStatus('connection is broken');
+        });
+    },
+
+    render: function() {
+
+        return (
+                <div className="chat-app-holder">
+                    <Messages messages={this.state.messages} />
+                    <Controls onMessageSent={this.onMessageSent} />
                 </div>
             );
     }

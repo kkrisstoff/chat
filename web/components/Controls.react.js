@@ -2,33 +2,20 @@
 
 var React = require('react');
 
-var Form = React.createClass({
+module.exports = Controls = React.createClass({
     onFormSubmit: function (e) {
         e.preventDefault();
-        console.log(e);
+        var text = e.target[0].value;
+        e.target[0].value = '';
 
-        return false;
+        this.props.onMessageSent(text);
     },
-    onChange: function (e) {
-        console.log(e);
-    },
-    render: function () {
-        return (
-            <form onSubmit={this.onFormSubmit}>
-                <input type="text" name="message" className="form-control" onChange={this.onChange} placeholder="Message..." />
-                <button className="btn">Add</button>
-            </form>
-            );
-    }
-});
-
-module.exports = Controls = React.createClass({
-
     render: function(){
-
         return (
-            <div className="contrils">
-                <Form />
+            <div className="controls-holder">
+                <form onSubmit={this.onFormSubmit}>
+                    <input type="text" name="message" className="form-control" onChange={this.onChange} placeholder="Message..." />
+                </form>
             </div>
             );
     }
