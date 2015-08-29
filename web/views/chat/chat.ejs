@@ -2,7 +2,12 @@
 
 <section id="react-app"></section>
 <script id="initial-state" type="application/json"><%- state %></script>
-<script type="text/javascript">
-    console.log(Connection);
-</script>
 <script src="js/bundle.js"></script>
+<script>
+    var initialStateHolder = document.getElementById('initial-state'),
+        initialState = JSON.parse(initialStateHolder.innerHTML),
+        mountNode = document.getElementById('react-app');
+    initialStateHolder.innerHTML = '';
+
+    React.render(React.createElement(ChatApp, initialState), mountNode);
+</script>

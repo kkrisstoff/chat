@@ -8,10 +8,20 @@
 
     <script src="/vendor/js/jquery.min.js"></script>
     <script src="/vendor/js/bootstrap.min.js"></script>
+
 </head>
 <body>
 <section class="container">
     <%- body -%>
 </section>
+<script src="/js/bundle.js" type="text/javascript"></script>
+<script>
+    var initialStateHolder = document.getElementById('initial-state'),
+        initialState = JSON.parse(initialStateHolder.innerHTML),
+        mountNode = document.getElementById('react-app');
+    initialStateHolder.innerHTML = '';
+
+    React.render(React.createElement(UserApp, initialState), mountNode);
+</script>
 </body>
 </html>

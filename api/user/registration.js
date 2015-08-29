@@ -8,14 +8,16 @@ exports.get = function (req, res) {
 };
 
 exports.post = function (req, res, next) {
-    var username = req.body.username,
-        mail = req.body.email || "" ,
-        password = req.body.password,
+    var body = req.body,
+        username = body.username,
+        mail = body.email || "" ,
+        password = body.password,
         user = {
             username: username,
             password: password,
             mail: mail
         };
+
     addUser(user, function (err, user) {
         if (err) return next(err);
         res.json({

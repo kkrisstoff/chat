@@ -26,6 +26,8 @@ module.exports = function (passport) {
             passwordField: 'password'
         },
         function(username, password, done) {
+//            console.log("LocalStrategy");
+//            console.log(username, password);
             User.findOne({username: username},
             function(err, user) {
                 if (err) { return done(err); }

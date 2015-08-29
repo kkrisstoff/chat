@@ -19,6 +19,6 @@ module.exports = Messages = React.createClass({
 
         return (
             <ul id="scrollable" className="messages-holder">{content}</ul>
-        )
+            )
     }
 });

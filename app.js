@@ -39,6 +39,9 @@ var routes = require('./web/routes/index');
 var user = require('./web/routes/user')(passport);
 var chat = require('./web/routes/chat');
 var api = require('api')(passport);
+
+var logger = require('morgan');
+app.use(logger('short'));
 app.use('/', routes);
 app.use('/user', user);
 app.use('/chat', chat);

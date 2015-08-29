@@ -1,9 +1,25 @@
 var log = require('lib/log')(module);
 
+var JSX = require('node-jsx').install(),
+    React = require('react'),
+    UserApp = React.createFactory(require('web/components/user/UserApp.react'));
+
 exports.get = function (req, res) {
+    var initialState = {
+        view: "login",
+        userName: "",
+        currentUser: null
+    };
+
+    var markup = React.renderToString(
+        UserApp(initialState)
+    );
+
     res.render('user/login', {
-        title: 'Login',
-        page: 'user.login'
+        title: 'logIn',
+        page: 'user.login',
+        markup: markup,
+        state: JSON.stringify(initialState)
     });
 };
 

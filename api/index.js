@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var checkAccess = require('middleware/checkAccess');
 
+var logger = require('morgan');
+router.use(logger('short'));
+
 module.exports = function (passport) {
     var authenticateLocal = passport.authenticate('local', {
         //failureRedirect: 'user/login/error'

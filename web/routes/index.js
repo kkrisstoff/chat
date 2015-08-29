@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
         var user = req.user,
             userName = user.username;
         res.render('chat/index', {
-            title: 'Express',
+            title: 'Home',
             user: userName
         });
     } else {
