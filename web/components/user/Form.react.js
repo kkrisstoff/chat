@@ -1,8 +1,11 @@
 /** @jsx React.DOM */
-
 var React = require('react');
 
-module.exports = Form = React.createClass({
+var Form = React.createClass({
+    views: {
+        login: ["newUser", "First time here?", "Log In"],
+        newUser: ["login", "User exist?", "Create"]
+    },
     getInitialState: function (props) {
         return props || this.props;
     },
@@ -12,20 +15,25 @@ module.exports = Form = React.createClass({
             inputName = form[0],
             inputPass = form[1],
             name = inputName.value,
-            pass = inputPass.value;
+            pass = inputPass.value,
+            action = form.id;
         inputName.value = '';
         inputPass.value = '';
 
-        this.props.onFormSubmit(name, pass);
+        this.props.onFormSubmit(action, name, pass);
     },
-    onNewUser: function () {
-
-        this.props.onViewChanged("newUser");
+    onChangeView: function (e) {
+        var newView = this.views[this.props.view][0];
+        this.props.onViewChanged(newView);
     },
     render: function(){
+        var view = this.props.view,
+            NewViewText = this.views[view][1],
+            submitText = this.views[view][2];
+
         return (
             <div className="controls-holder">
-                <form id="logIn" name="login" className="login-form" onSubmit={this.onFormSubmit}>
+                <form id={view} name="login" className="login-form" onSubmit={this.onFormSubmit}>
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
@@ -47,10 +55,10 @@ module.exports = Form = React.createClass({
                     </div>
                     <div className="row controls">
                         <div className="col-md-6">
-                            <input className="btn btn-default btn-sm" type="submit" value="Log In"/>
+                            <input className="btn btn-default btn-sm" type="submit" value={submitText}/>
                         </div>
                         <div className="col-md-6">
-                            <div className="btn btn-default btn-sm" onClick={this.onNewUser} role="button">first time here</div>
+                            <div className="btn btn-default btn-sm" onClick={this.onChangeView} role="button">{NewViewText}</div>
                         </div>
                     </div>
                 </form>
@@ -58,3 +66,5 @@ module.exports = Form = React.createClass({
             );
     }
 });
+
+module.exports = Form;
