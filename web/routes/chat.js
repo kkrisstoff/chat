@@ -6,7 +6,7 @@ var log = require('lib/log')(module);
 var JSX = require('node-jsx').install(),
     React = require('react'),
     ChatModel = require('models/chat').Chat,
-    ChatApp = React.createFactory(require('web/components/ChatApp.react'));
+    ChatApp = React.createFactory(require('web/react/chatView/components/ChatApp.react'));
 
 
 var logger = require('morgan');
@@ -21,6 +21,7 @@ router.get('/home', checkAccess,  function(req, res, next) {
         user: userName
     });
 });
+
 /* GET chat. */
 router.get('/', checkAccess,  function(req, res, next) {
     var user = req.user,
@@ -30,19 +31,17 @@ router.get('/', checkAccess,  function(req, res, next) {
         if (err) return next(err);
         var i, l = data.length,
             messages = [],
-            initialState;
+            initialState,
+            markup;
+
         for (i = 0; i < l; i++){
             messages.push(data[i].getMessage());
         }
-
         initialState = {
             currentUser: user,
             messages: messages
         };
-        //example
-        //var TodoApp = React.createFactory(require('web/components/TodoApp.react'));
-        var markup = React.renderToString(
-            //TodoApp()
+        markup = React.renderToString(
             ChatApp(initialState)
         );
 
@@ -53,11 +52,6 @@ router.get('/', checkAccess,  function(req, res, next) {
             state: JSON.stringify(initialState)
         });
     });
-
-//    res.render('chat', {
-//        title: 'Chat',
-//        user: userName
-//    });
 });
 /* GET friends page */
 router.get('/friends', checkAccess,  function(req, res, next) {

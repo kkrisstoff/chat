@@ -3,6 +3,10 @@
 var React = require('react');
 var Messages = require('./Messages.react.js');
 var Controls = require('./Controls.react.js');
+var Connection = require('../utils/Connection');
+
+var MessageStore = require('../stores/MessagesStore');
+var MessageActions = require('../actions/MessageActions');
 
 var TodoList = React.createClass({
     render: function() {
@@ -14,20 +18,25 @@ var TodoList = React.createClass({
 });
 
 function setConnection(self) {
-    var connection = new Connection({
+    self.connection = new Connection({
         prefix: "/chatConnection",
         socket: {debug: true},
         debug: true
     });
-    self.connection = connection;
 }
 
-module.exports = ChatApp = React.createClass({
+function setInitialMessagesToStory(messages) {
+    MessageActions.setInitialMessages(messages);
+}
+
+module.exports = React.createClass({
+
     componentWillMount: function () {
         console.log("componentWillMount");
     },
     componentDidMount: function () {
         console.log("componentDidMount");
+        MessageStore.addChangeListener(this._onChange);
         setConnection(this);
         this.setCallbacksToConnection();
     },
@@ -38,14 +47,26 @@ module.exports = ChatApp = React.createClass({
         console.log("componentWillUpdate");
 
     },
+    componentWillUnmount: function() {
+        MessageStore.removeChangeListener(this._onChange);
+    },
+
     getInitialState: function (props) {
         var props = props || this.props;
+        setInitialMessagesToStory(props.messages);
+        //return null;
         return {
             messages: props.messages,
             value: ''
         };
-
     },
+
+    _onChange: function(e) {
+        console.log("_onChange");
+        console.log(arguments);
+        //this.props.onMessageSent(text);
+    },
+
     /**
      * Controls --> Message Sent
      * @param text
@@ -86,10 +107,11 @@ module.exports = ChatApp = React.createClass({
     setCallbacksToConnection: function () {
         var self = this;
 
+        console.log(this.connection);
         this.connection.on('open', function() {
             self.printStatus(null, 'the connection is established');
         });
-        this.connection.on(null, 'disconnect', function() {
+        this.connection.on('disconnect', function() {
             self.printStatus(null, 'the connection is broken');
         });
         this.connection.on('message', function(e, message) {

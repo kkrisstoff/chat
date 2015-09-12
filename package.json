@@ -6,8 +6,8 @@
     "start": "NODE_ENV=production NODE_PATH=. node www",
     "dev": "NODE_ENV=development NODE_PATH=. node www",
     "debug": "NODE_ENV=development NODE_PATH=. node --debug www",
-    "browserify": "browserify web/reactApp.js -o public/js/bundle.js",
-    "browserify-prod": "browserify web/reactApp.js | uglifyjs > public/js/bundle.js"
+    "browserify": "browserify web/react/app.js -o public/js/bundle.js",
+    "browserify-prod": "browserify web/react/app.js | uglifyjs > public/js/bundle.js"
   },
   "dependencies": {
     "async": "^1.4.0",
@@ -22,10 +22,13 @@
     "errorhandler": "^1.4.2",
     "express": "~4.13.1",
     "express-session": "^1.11.3",
+    "flux": "^2.1.1",
+    "keymirror": "^0.1.1",
     "mongoose": "^4.0.7",
     "morgan": "~1.6.1",
     "nconf": "^0.7.1",
     "node-jsx": "^0.13.3",
+    "object-assign": "^4.0.1",
     "passport": "^0.2.2",
     "passport-local": "^1.0.0",
     "react": "^0.13.3",
@@ -37,9 +40,9 @@
   "devDependencies": {
     "reactify": "^1.1.1"
   },
-    "browserify": {
-        "transform": [
-            "reactify"
-        ]
-    }
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  }
 }
