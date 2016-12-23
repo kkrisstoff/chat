@@ -1,21 +1,14 @@
 /** @jsx React.DOM */
 
-var React = require('react');
-var Messages = require('./Messages.react.js');
-var Controls = require('./Controls.react.js');
-var Connection = require('../utils/Connection');
+const React = require('react');
 
-var MessageStore = require('../stores/MessagesStore');
-var MessageActions = require('../actions/MessageActions');
+const MessageStore = require('../stores/MessagesStore');
+const MessageActions = require('../actions/MessageActions');
 
-var TodoList = React.createClass({
-    render: function() {
-        var createItem = function(itemText, index) {
-            return <li key={index + itemText}>{itemText}</li>;
-        };
-        return <ul>{this.props.items.map(createItem)}</ul>;
-    }
-});
+const Messages = require('./Messages.react.js');
+const Controls = require('./Controls.react.js');
+
+const Connection = require('../utils/Connection');
 
 function setConnection(self) {
     self.connection = new Connection({
@@ -31,28 +24,19 @@ function setInitialMessagesToStory(messages) {
 
 module.exports = React.createClass({
 
-    componentWillMount: function () {
-        console.log("componentWillMount");
-    },
     componentDidMount: function () {
-        console.log("componentDidMount");
         MessageStore.addChangeListener(this._onChange);
         setConnection(this);
         this.setCallbacksToConnection();
     },
-    componentWillReceiveProps: function () {
-        console.log("componentWillReceiveProps");
-    },
-    componentWillUpdate: function () {
-        console.log("componentWillUpdate");
 
-    },
     componentWillUnmount: function() {
         MessageStore.removeChangeListener(this._onChange);
     },
 
     getInitialState: function (props) {
         var props = props || this.props;
+
         setInitialMessagesToStory(props.messages);
         //return null;
         return {
@@ -131,11 +115,11 @@ module.exports = React.createClass({
     render: function() {
 
         return (
-                <div className="chat-app-holder">
-                    <Messages messages={this.state.messages} />
-                    <Controls onMessageSent={this.onMessageSent} />
-                </div>
-            );
+            <div className="chat-app-holder">
+                <Messages messages={this.state.messages} />
+                <Controls onMessageSent={this.onMessageSent} />
+            </div>
+        );
     }
 
 });

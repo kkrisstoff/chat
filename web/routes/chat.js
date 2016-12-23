@@ -1,15 +1,18 @@
-var express = require('express');
-var router = express.Router();
-var checkAccess = require('middleware/checkAccess');
-var log = require('lib/log')(module);
+require('node-jsx').install()
 
-var JSX = require('node-jsx').install(),
-    React = require('react'),
-    ChatModel = require('models/chat').Chat,
-    ChatApp = React.createFactory(require('web/react/chatView/components/ChatApp.react'));
+const express = require('express');
+const router = express.Router();
+const checkAccess = require('middleware/checkAccess');
+const log = require('lib/log')(module);
 
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const ChatModel = require('models/chat').Chat;
+const ChatAppComponent = require('web/react/chatView/components/ChatApp.react');
 
-var logger = require('morgan');
+const ChatApp = React.createFactory(ChatAppComponent);
+
+const logger = require('morgan');
 router.use(logger('short'));
 
 /* GET home page. */
@@ -41,18 +44,19 @@ router.get('/', checkAccess,  function(req, res, next) {
             currentUser: user,
             messages: messages
         };
-        markup = React.renderToString(
+        markup = ReactDOMServer.renderToString(
             ChatApp(initialState)
         );
 
         res.render('chat/chat', {
             title: 'Chat',
             user: userName,
-            //markup: markup,
+            markup: markup,
             state: JSON.stringify(initialState)
         });
     });
 });
+
 /* GET friends page */
 router.get('/friends', checkAccess,  function(req, res, next) {
     var user = req.user,

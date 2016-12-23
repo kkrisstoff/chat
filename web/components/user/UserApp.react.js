@@ -1,22 +1,11 @@
 /** @jsx React.DOM */
 
-var React = require('react');
-var Form = require('./Form.react.js');
-var Header = require('./Header.react.js');
+const React = require('react');
+const Form = require('./Form.react.js');
+const Header = require('./Header.react.js');
 
 module.exports = UserApp = React.createClass({
-    componentWillMount: function () {
-        console.log("componentWillMount");
-    },
-    componentDidMount: function () {
-        console.log("componentDidMount");
-    },
-    componentWillReceiveProps: function () {
-        console.log("componentWillReceiveProps");
-    },
-    componentWillUpdate: function () {
-        console.log("componentWillUpdate");
-    },
+
     getInitialState: function (props) {
         return props || this.props;
     },

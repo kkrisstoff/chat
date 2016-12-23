@@ -1,8 +1,11 @@
-var log = require('lib/log')(module);
+require('node-jsx').install();
 
-var JSX = require('node-jsx').install(),
-    React = require('react'),
-    UserApp = React.createFactory(require('web/components/user/UserApp.react'));
+
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const UserAppComponent = require('web/components/user/UserApp.react');
+
+const UserApp = React.createFactory(UserAppComponent);
 
 exports.get = function (req, res) {
     var initialState = {
@@ -11,14 +14,12 @@ exports.get = function (req, res) {
         currentUser: null
     };
 
-    var markup = React.renderToString(
-        UserApp(initialState)
-    );
-
     res.render('user/login', {
         title: 'logIn',
         page: 'user.login',
-        markup: markup,
+        markup: ReactDOMServer.renderToString(
+                UserApp(initialState)
+            ),
         state: JSON.stringify(initialState)
     });
 };

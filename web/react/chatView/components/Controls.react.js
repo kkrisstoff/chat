@@ -1,21 +1,18 @@
 /** @jsx React.DOM */
 
-var React = require('react');
-var MessageActions = require('../actions/MessageActions');
+const React = require('react');
+const MessageActions = require('../actions/MessageActions');
 
 module.exports = Controls = React.createClass({
 
-
     _onFormSubmit: function (e) {
         e.preventDefault();
-        var text = e.target[0].value;
+        let text = e.target[0].value;
         e.target[0].value = '';
 
         console.log("Form Submitted: ", text);
         MessageActions.createMessage(text);
-
     },
-
 
     render: function(){
         return (
