@@ -5,18 +5,19 @@ var ActionTypes = ChatConstants.ActionTypes;
 
 module.exports = {
 
-    createMessage: function(text) {
-        console.log("createMessage", text);
-
+    addMessage: function(message) {
         ChatDispatcher.dispatch({
             type: ActionTypes.CREATE_MESSAGE,
             data: {
-                text: text
+                message: message
             }
         });
     },
 
-    setInitialMessages: function (messages) {
+    /**
+     * get Initial State from the server
+     */
+    addMessages: function (messages) {
         ChatDispatcher.dispatch({
             type: ActionTypes.INIT_MESSAGES,
             data: {

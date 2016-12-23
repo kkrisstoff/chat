@@ -11,10 +11,13 @@ module.exports = Messages = React.createClass({
         scrollElement.scrollTop = scrollElement.scrollHeight;
     },
 
+
     render: function(){
+        var user = this.props.user;
+
         var content = this.props.messages.map(function(message, index){
             return (
-                <Message  key={'message_' + index} message={message} />
+                <Message  key={'message_' + index} message={message} user={user}/>
             );
         });
 

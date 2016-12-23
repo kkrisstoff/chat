@@ -10,8 +10,7 @@ module.exports = Controls = React.createClass({
         let text = e.target[0].value;
         e.target[0].value = '';
 
-        console.log("Form Submitted: ", text);
-        MessageActions.createMessage(text);
+        this.props.onMessageSent(text);
     },
 
     render: function(){
@@ -21,6 +20,6 @@ module.exports = Controls = React.createClass({
                     <input type="text" name="message" className="form-control" onChange={this.onChange} placeholder="Message..." />
                 </form>
             </div>
-            );
+        );
     }
 });

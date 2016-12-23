@@ -18,10 +18,6 @@ function setConnection(self) {
     });
 }
 
-function setInitialMessagesToStory(messages) {
-    MessageActions.setInitialMessages(messages);
-}
-
 module.exports = React.createClass({
 
     componentDidMount: function () {
@@ -37,54 +33,18 @@ module.exports = React.createClass({
     getInitialState: function (props) {
         var props = props || this.props;
 
-        setInitialMessagesToStory(props.messages);
-        //return null;
+        MessageActions.addMessages(props.messages);
         return {
-            messages: props.messages,
-            value: ''
+            messages: props.messages
         };
     },
 
-    _onChange: function(e) {
-        console.log("_onChange");
-        console.log(arguments);
-        //this.props.onMessageSent(text);
-    },
+    onStateChanged: function (messages) {
+        if (!Array.isArray(messages)) messages = [messages];
 
-    /**
-     * Controls --> Message Sent
-     * @param text
-     */
-    onMessageSent: function (text) {
-        this.connection.send({text: text});
-        this.printMessage(null, text)
-    },
-
-    addItemToState: function (item) {
-        this.state.messages.push(item);
         this.setState({
-            messages: this.state.messages
+            messages: messages
         });
-    },
-    printMessage: function (user, message) {
-        var messageItem = {
-                username: user || "Me",//this.props.currentUser.username
-                created: new Date(),
-                text: message,
-                type: "message"
-            };
-
-        this.addItemToState(messageItem)
-    },
-    printStatus: function (user, status) {
-        var statusItem = {
-                username: user || null,
-                created: new Date(),
-                text: status,
-                type: "status"
-            };
-
-        this.addItemToState(statusItem);
     },
 
     /**Setters*/
@@ -112,11 +72,51 @@ module.exports = React.createClass({
         });
     },
 
+    _onChange: function(messages) {
+        this.onStateChanged(messages);
+    },
+
+    /**
+     * Controls --> Message Sent
+     * @param text
+     */
+    onMessageSent: function (text) {
+        const message = this.createMessage(text);
+        console.log(message);
+
+        MessageActions.addMessage(message);
+    },
+
+    createMessage: function (message) {
+        return {
+            username: this.props.currentUser.username,
+            created: new Date(),
+            text: message,
+            type: "message"
+        };
+    },
+
+    printStatus: function (user, status) {
+        const statusMessage = this.createStatus(user, status);
+
+        MessageActions.addMessage(statusMessage);
+    },
+
+    createStatus: function (user, status) {
+        return {
+            username: user || null,
+            created: new Date(),
+            text: status,
+            type: "status"
+        };
+    },
+
     render: function() {
+        var currentUser = this.props.currentUser.username;
 
         return (
             <div className="chat-app-holder">
-                <Messages messages={this.state.messages} />
+                <Messages messages={this.state.messages} user={currentUser}/>
                 <Controls onMessageSent={this.onMessageSent} />
             </div>
         );
