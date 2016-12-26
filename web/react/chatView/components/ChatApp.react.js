@@ -51,24 +51,28 @@ module.exports = React.createClass({
     setCallbacksToConnection: function () {
         var self = this;
 
-        console.log(this.connection);
         this.connection.on('open', function() {
             self.printStatus(null, 'the connection is established');
         });
+
         this.connection.on('disconnect', function() {
             self.printStatus(null, 'the connection is broken');
         });
-        this.connection.on('message', function(e, message) {
-            if (message.text) {
-                self.printMessage(message.username, message.text);
-            } else if (message.status) {
-                self.printStatus(message.username, message.status);
-            } else {
+
+        this.connection.on('message', function(message) {
+            if (message.type == 'message') {
+                self.onMessageReceive(message);
+            }
+            else if (message.type == 'status') {
+                self.printStatus(message.username, message.text);
+            }
+            else {
                 throw new Error("Bad message: " + message);
             }
         });
+
         this.connection.on('close', function(e) {
-            self.printStatus('connection is broken');
+            self.printStatus(null, 'connection is broken');
         });
     },
 
@@ -78,15 +82,28 @@ module.exports = React.createClass({
 
     /**
      * Controls --> Message Sent
-     * @param text
+     * @param {string} text
      */
     onMessageSent: function (text) {
         const message = this.createMessage(text);
-        console.log(message);
 
+        this.connection.send({text: text});
         MessageActions.addMessage(message);
     },
 
+    /**
+     * Connection --> Receive Message
+     * @param {object} message
+     */
+    onMessageReceive(message) {
+        MessageActions.addMessage(message);
+    },
+
+    /**
+     *
+     * @param {string} message
+     * @returns {{username, created: Date, text: string, type: string}}
+     */
     createMessage: function (message) {
         return {
             username: this.props.currentUser.username,
@@ -112,7 +129,7 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var currentUser = this.props.currentUser.username;
+        const currentUser = this.props.currentUser.username;
 
         return (
             <div className="chat-app-holder">

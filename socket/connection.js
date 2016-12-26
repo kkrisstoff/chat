@@ -88,6 +88,7 @@ Connection.prototype.onHandshake = function(message) {
             type: 'handshake'
         });
         self.broadcast({
+            type: 'status',
             username: self.user.username,
             text: 'connected to chat'
         });
@@ -110,6 +111,7 @@ Connection.prototype.onMessage = function(message) {
             saveMassage(username, text, function (err) {
                 if (!err){
                     self.broadcast({
+                        type: 'message',
                         username: username || "unknown user",
                         text: text
                     });
@@ -129,6 +131,7 @@ Connection.prototype.onClose = function() {
     var self = this;
     connections.removeClientById(this.connection.id);
     this.broadcast({
+        type: 'status',
         username: self.user.username,
         text: 'left chat'
     });

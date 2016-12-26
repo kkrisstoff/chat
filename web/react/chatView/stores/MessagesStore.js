@@ -10,7 +10,7 @@ const ActionTypes = ChatConstants.ActionTypes;
 
 let _messages = [];
 
-window.MessageStore = assign({}, EventEmitter.prototype, {
+let MessageStore = assign({}, EventEmitter.prototype, {
     emitChange: function() {
         this.emit(CHANGE_EVENT, this.getAll());
     },
@@ -55,9 +55,7 @@ window.MessageStore = assign({}, EventEmitter.prototype, {
 MessageStore.dispatchToken = ChatDispatcher.register(function(action) {
     const type = action.type;
     const data = action.data;
-
-    console.log("Store.action: ", type);
-    console.log(data);
+    
     switch(type) {
         case ActionTypes.INIT_MESSAGES:
             MessageStore.addMessages(data.messages);

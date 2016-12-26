@@ -1,5 +1,5 @@
-var EventEmitter = require('events').EventEmitter;
-var assign = require('object-assign');
+const EventEmitter = require('events').EventEmitter;
+const assign = require('object-assign');
 
 function Connection(options) {
     this.options = options || {};
@@ -38,7 +38,6 @@ Connection.prototype.onOpen = function () {
         method: 'POST',
         url: '/chat/socketKey',
         success: function (data) {
-            console.log("socketKey: " + data.socketKey);
             self.socket.send(JSON.stringify({
                 type: 'handshake',
                 socketKey: data.socketKey
@@ -49,11 +48,7 @@ Connection.prototype.onOpen = function () {
 };
 
 Connection.prototype.onMessage = function (e) {
-    var message = JSON.parse(e.data);
-
-    if (this.options.debug) {
-        console.log("message:", message);
-    }
+    const message = JSON.parse(e.data);
 
     if (this.status == this.CONNECTING) {
         if (message.type == 'handshake') {
@@ -106,12 +101,10 @@ Connection.prototype.onClose = function (event) {
 };
 
 Connection.prototype.send = function (message) {
-    console.log(message);
     if (this.status != this.OPEN) {
         throw new Error("Connection is not open");
     }
     this.socket.send(JSON.stringify(message));
 };
-
 
 module.exports = Connection;
